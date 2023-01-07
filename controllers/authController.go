@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"log"
 	"net/http"
 
+	"github.com/ezkahan/golab/configs"
 	"github.com/ezkahan/golab/helpers"
 	"github.com/ezkahan/golab/models"
 	"github.com/gin-gonic/gin"
@@ -11,17 +13,23 @@ import (
 func SignUp(ctx *gin.Context) {
 	var user models.User
 
-	if err := ctx.ShouldBindJson(&user); err != nil {
+	if err := ctx.ShouldBindJSON(&user); err != nil {
 		ctx.JSON(http.StatusUnprocessableEntity, "Invalid json data")
 		return
 	}
 
-	// check user
+	result := configs.DB.First(&user)
+
+	if result.Error != nil {
+		log.Fatal("Error finding user")
+	}
+
+	// check user continue
 
 	token, err := helpers.CreateToken(uint64(user.ID))
 
 	if err != nil {
-		ctx.JSON(http.StatusunprocessableEntity, err.Error())
+		ctx.JSON(http.StatusUnprocessableEntity, err.Error())
 		return
 	}
 
@@ -32,7 +40,13 @@ func SignUp(ctx *gin.Context) {
 }
 
 func SignIn(ctx *gin.Context) {
-	var user models.User
+	// var user models.User
 
-	return
+	// return
+}
+
+func Logout(ctx *gin.Context) {
+	// var user models.User
+
+	// return
 }

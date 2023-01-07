@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/ezkahan/golab/configs"
-	"github.com/ezkahan/golab/models"
+	authController "github.com/ezkahan/golab/controllers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,22 +17,17 @@ func init() {
 
 func main() {
 	port := os.Getenv("PORT")
-
 	router := gin.Default()
 
 	router.GET("/", func(ctx *gin.Context) {
-		user := models.User{Email: "ezkahan.dev@gmail.com", Password: "test123"}
-
-		result := configs.DB.Create(&user)
-
-		if result.Error != nil {
-			log.Fatal("Error: ", result.Error)
-		}
-
 		ctx.JSON(200, gin.H{
 			"message": "Hello",
 		})
 	})
+
+	router.POST("/signin", authController.SignIn)
+	router.POST("/signup", authController.SignUp)
+	router.POST("/logout", authController.Logout)
 
 	router.Run()
 
