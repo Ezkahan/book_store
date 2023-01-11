@@ -5,7 +5,8 @@ import (
 	"os"
 
 	"github.com/ezkahan/golab/configs"
-	authController "github.com/ezkahan/golab/controllers"
+	controller "github.com/ezkahan/golab/controllers"
+	"github.com/ezkahan/golab/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -25,9 +26,10 @@ func main() {
 		})
 	})
 
-	router.POST("/signin", authController.SignIn)
-	router.POST("/signup", authController.SignUp)
-	router.POST("/logout", authController.Logout)
+	router.GET("/", middleware.RequireAuth, controller.Home)
+	router.POST("/signin", controller.SignIn)
+	router.POST("/signup", controller.SignUp)
+	router.POST("/logout", controller.Logout)
 
 	router.Run()
 
