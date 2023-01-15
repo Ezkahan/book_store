@@ -1,17 +1,17 @@
-package controllers
+package auth
 
 import (
 	"net/http"
 
-	"github.com/ezkahan/golab/configs"
-	"github.com/ezkahan/golab/helpers"
-	"github.com/ezkahan/golab/models"
+	"github.com/ezkahan/golab/config"
+	"github.com/ezkahan/golab/src/modules/user/entities"
+	"github.com/ezkahan/golab/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func SignUp(ctx *gin.Context) {
-	var body models.User
+	var body entities.User
 
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -31,12 +31,12 @@ func SignUp(ctx *gin.Context) {
 		return
 	}
 
-	user := models.User{
+	user := entities.User{
 		Email:    body.Email,
 		Password: string(hash),
 	}
 
-	result := configs.DB.Create(&user)
+	result := config.DB.Create(&user)
 
 	if result.Error != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -46,7 +46,7 @@ func SignUp(ctx *gin.Context) {
 		return
 	}
 
-	token, err := helpers.CreateToken(uint64(user.ID))
+	token, err := utils.CreateToken(uint64(user.ID))
 
 	if err != nil {
 		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -63,7 +63,7 @@ func SignUp(ctx *gin.Context) {
 }
 
 func SignIn(ctx *gin.Context) {
-	var body models.User
+	var body entities.User
 
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -73,8 +73,8 @@ func SignIn(ctx *gin.Context) {
 		return
 	}
 
-	var user models.User
-	configs.DB.First(&user, "email = ?", body.Email)
+	var user entities.User
+	config.DB.First(&user, "email = ?", body.Email)
 
 	if user.ID == 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -94,7 +94,7 @@ func SignIn(ctx *gin.Context) {
 		return
 	}
 
-	token, err := helpers.CreateToken(uint64(user.ID))
+	token, err := utils.CreateToken(uint64(user.ID))
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
@@ -108,12 +108,8 @@ func SignIn(ctx *gin.Context) {
 		"user":  user,
 		"token": token,
 	})
-
-	// return
 }
 
 func Logout(ctx *gin.Context) {
-	// var user models.User
-
 	// return
 }

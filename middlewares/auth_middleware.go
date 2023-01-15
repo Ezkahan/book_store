@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func RequireAuth(ctx *gin.Context) {
+func AuthMiddleware(ctx *gin.Context) {
 	fmt.Println("I'm from middleware")
 
 	ctx.Next()

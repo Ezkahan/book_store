@@ -1,4 +1,4 @@
-package controllers
+package home
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Home(ctx *gin.Context) {
+func Index(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{
 		"success": "Welcome",
 	})

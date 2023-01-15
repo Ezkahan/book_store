@@ -1,4 +1,4 @@
-package helpers
+package utils
 
 import (
 	"os"
@@ -13,7 +13,8 @@ func CreateToken(userId uint64) (string, error) {
 	claims["authorizer"] = true
 	claims["user_id"] = userId
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
-	newClaim := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+
+	newClaim := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	token, err := newClaim.SignedString([]byte(os.Getenv("JWT_SECRET")))
 
 	if err != nil {
