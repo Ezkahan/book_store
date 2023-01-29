@@ -1,4 +1,4 @@
-module github.com/ezkahan/golab
+module github.com/ezkahan/book_store
 
 go 1.19
 

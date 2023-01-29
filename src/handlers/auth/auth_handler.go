@@ -3,9 +3,9 @@ package auth
 import (
 	"net/http"
 
-	"github.com/ezkahan/golab/config"
-	"github.com/ezkahan/golab/src/modules/user/entities"
-	"github.com/ezkahan/golab/utils"
+	"github.com/ezkahan/book_store/config"
+	"github.com/ezkahan/book_store/src/modules/user/entities"
+	"github.com/ezkahan/book_store/utils"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -21,19 +21,9 @@ func SignUp(ctx *gin.Context) {
 		return
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 16)
-
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to hash password",
-		})
-
-		return
-	}
-
 	user := entities.User{
 		Email:    body.Email,
-		Password: string(hash),
+		Password: body.Password,
 	}
 
 	result := config.DB.Create(&user)
@@ -46,7 +36,7 @@ func SignUp(ctx *gin.Context) {
 		return
 	}
 
-	token, err := utils.CreateToken(uint64(user.ID))
+	token, err := utils.GenerateToken(uint64(user.ID))
 
 	if err != nil {
 		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -94,7 +84,7 @@ func SignIn(ctx *gin.Context) {
 		return
 	}
 
-	token, err := utils.CreateToken(uint64(user.ID))
+	token, err := utils.GenerateToken(uint64(user.ID))
 
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{

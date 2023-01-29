@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/ezkahan/golab/config"
-	router "github.com/ezkahan/golab/router"
+	"github.com/ezkahan/book_store/config"
+	router "github.com/ezkahan/book_store/router"
 )
 
 func init() {
