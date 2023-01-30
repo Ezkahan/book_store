@@ -21,7 +21,9 @@ type User struct {
 	Favorites []favoriteEntity.Favorite `gorm:"string"`
 }
 
-func (u *User) BeforeSave() error {
+type UserList []User
+
+func (u *User) BeforeCreate() error {
 	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 16)
 
 	if err != nil {

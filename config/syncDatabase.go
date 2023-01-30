@@ -1,19 +1,22 @@
 package config
 
 import (
-	authorEntity "github.com/ezkahan/book_store/src/modules/author/entities"
-	bannerEntity "github.com/ezkahan/book_store/src/modules/banner/entities"
-	bookEntity "github.com/ezkahan/book_store/src/modules/book/entities"
-	categoryEntity "github.com/ezkahan/book_store/src/modules/category/entities"
-	imageEntity "github.com/ezkahan/book_store/src/modules/image/entities"
-	userEntity "github.com/ezkahan/book_store/src/modules/user/entities"
+	"github.com/ezkahan/book_store/database/mysql"
+	authorEntity "github.com/ezkahan/book_store/src/modules/author/entity"
+	bannerEntity "github.com/ezkahan/book_store/src/modules/banner/entity"
+	bookEntity "github.com/ezkahan/book_store/src/modules/book/entity"
+	categoryEntity "github.com/ezkahan/book_store/src/modules/category/entity"
+	commentEntity "github.com/ezkahan/book_store/src/modules/comment/entity"
+	favoriteEntity "github.com/ezkahan/book_store/src/modules/favorite/entity"
+	imageEntity "github.com/ezkahan/book_store/src/modules/image/entity"
+	userEntity "github.com/ezkahan/book_store/src/modules/user/entity"
 )
 
 func SyncDatabase() {
-	DB.AutoMigrate(
+	mysql.DB.AutoMigrate(
 		&userEntity.User{},
-		&userEntity.Comment{},
-		&userEntity.Favorite{},
+		&commentEntity.Comment{},
+		&favoriteEntity.Favorite{},
 		&bannerEntity.Banner{},
 		&bookEntity.Book{},
 		&categoryEntity.Category{},

@@ -7,7 +7,8 @@ import (
 )
 
 func AuthMiddleware(ctx *gin.Context) {
-	authorization := ctx.Request.Header.Get("Authorization")
+	// authorization := ctx.Request.Header.Get("Authorization")
+	authorization := ctx.GetHeader("Authorization")
 	token := strings.Split(authorization, "Bearer")
 
 	if len(token) > 0 && token[1] == "" {

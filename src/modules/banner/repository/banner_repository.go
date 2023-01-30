@@ -1,12 +1,11 @@
 package repository
 
 import (
-	"github.com/ezkahan/book_store/src/modules/banner/entity"
 	"gorm.io/gorm"
 )
 
 type IBannerRepository interface {
-	Add(data string) entity.Banner
+	Add(data string) error
 	Delete(id uint) error
 }
 
@@ -20,8 +19,8 @@ func NewBannerRepository(db *gorm.DB) *BannerRepository {
 	}
 }
 
-func (repo *BannerRepository) Add(data string) {
-	//
+func (repo *BannerRepository) Add(banner string) {
+	// return repo.db.Create(banner)
 }
 
 func (repo *BannerRepository) Delete(id uint) {
