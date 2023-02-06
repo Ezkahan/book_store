@@ -6,7 +6,6 @@ import (
 )
 
 type Book struct {
-	gorm.Model
 	Slug        string  `gorm:"unique;size:255;not null" json:"slug"`
 	Title       string  `gorm:"not null; size:255" json:"title"`
 	Description string  `gorm:"text" json:"description"`
@@ -18,4 +17,5 @@ type Book struct {
 	CategoryId  uint64
 	AuthorId    uint64
 	Images      []imageEntity.Image
+	gorm.Model
 }

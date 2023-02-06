@@ -1,43 +1,39 @@
 package entity
 
 import (
+	"errors"
+
 	commentEntity "github.com/ezkahan/book_store/src/modules/comment/entity"
 	favoriteEntity "github.com/ezkahan/book_store/src/modules/favorite/entity"
 	"golang.org/x/crypto/bcrypt"
+
 	"gorm.io/gorm"
 )
 
 type User struct {
-	gorm.Model
 	ID        uint64                    `gorm:"unique;primaryKey;autoIncrement" json:"id"`
 	Name      string                    `gorm:"size:25;not null;" json:"name"`
-	Email     string                    `gorm:"size:50;not null;unique" json:"email"`
 	Phone     string                    `gorm:"size:16;not null;unique" json:"phone"`
-	Password  string                    `gorm:"size:50;no null" json:"-"`
+	Password  string                    `gorm:"size:128;not null" json:"-"`
+	Email     string                    `gorm:"size:50;" json:"email"`
 	Image     string                    `gorm:"size:100" json:"image,omitempty"`
-	Points    string                    `gorm:"not null;default:0" json:"points"`
-	Role      string                    `gorm:"default:'user'"`
-	Comments  []commentEntity.Comment   `gorm:"string"`
-	Favorites []favoriteEntity.Favorite `gorm:"string"`
+	Points    int16                     `gorm:"not null;default:0" json:"points"`
+	Role      string                    `gorm:"default:'user'" json:"role"`
+	Comments  []commentEntity.Comment   `gorm:"string" json:"comments"`
+	Favorites []favoriteEntity.Favorite `gorm:"string" json:"favorites"`
+	Token     string                    `gorm:"-" json:"token"`
+	gorm.Model
 }
 
 type UserList []User
 
-func (u *User) BeforeCreate() error {
-	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 16)
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(u.Password), 8)
 
 	if err != nil {
-		return err
+		return errors.New("error hashing password")
 	}
 
 	u.Password = string(hash)
-
-	return nil
+	return
 }
-
-// hooks
-// BeforeSave
-// BeforeCreate
-// AfterSave
-// AfterCreate
-// ...

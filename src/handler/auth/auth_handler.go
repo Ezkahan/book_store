@@ -3,18 +3,16 @@ package auth
 import (
 	"net/http"
 
-	// "github.com/ezkahan/book_store/database/mysql"
 	"github.com/ezkahan/book_store/src/modules/user/entity"
+	"github.com/ezkahan/book_store/src/modules/user/request"
 	"github.com/ezkahan/book_store/src/modules/user/service"
 	"github.com/ezkahan/book_store/utils"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthHandler interface {
 	SignUp(ctx *gin.Context)
 	SignIn(ctx *gin.Context)
-	Logout(ctx *gin.Context)
 }
 
 type authHandler struct {
@@ -28,95 +26,64 @@ func NewAuthHandler(userService service.UserService) AuthHandler {
 }
 
 func (h *authHandler) SignUp(ctx *gin.Context) {
-	var body entity.User
+	var request request.UserCreateRequest
 
-	if err := ctx.ShouldBindJSON(&body); err != nil {
+	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to read body",
 		})
-
-		return
 	}
 
-	user := entity.User{
-		Email:    body.Email,
-		Password: body.Password,
-	}
-
-	// result := mysql.DB.Create(&user)
-
-	// if result.Error != nil {
-	// 	ctx.JSON(http.StatusBadRequest, gin.H{
-	// 		"error": "Failed to create user",
-	// 	})
-
-	// 	return
-	// }
-
-	token, err := utils.GenerateToken(uint64(user.ID))
-
-	if err != nil {
-		ctx.JSON(http.StatusUnprocessableEntity, gin.H{
-			"error": "Failed to create token",
+	if !h.userService.IsDuplicatePhone(request.Phone) {
+		ctx.JSON(http.StatusOK, gin.H{
+			"error": "Duplicate phone",
 		})
+	} else {
+		createdUser := h.userService.CreateUser(request)
+		token, err := utils.GenerateToken(createdUser.ID)
+		createdUser.Token = token
 
-		return
+		if err != nil {
+			ctx.JSON(http.StatusUnprocessableEntity, gin.H{
+				"error": "Failed to generate token",
+			})
+		}
+
+		ctx.JSON(http.StatusOK, gin.H{
+			"user": createdUser,
+		})
 	}
-
-	ctx.JSON(http.StatusOK, gin.H{
-		"user":  user,
-		"token": token,
-	})
 }
 
 func (h *authHandler) SignIn(ctx *gin.Context) {
-	var body entity.User
+	var request request.UserLoginRequest
 
-	if err := ctx.ShouldBindJSON(&body); err != nil {
+	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to read body",
 		})
-
 		return
 	}
 
-	var user entity.User
-	// mysql.DB.First(&user, "email = ?", body.Email)
+	authResult := h.userService.VerifyCredential(request.Phone, request.Password)
+	if user, ok := authResult.(entity.User); ok {
+		generatedToken, err := utils.GenerateToken(user.ID)
+		user.Token = generatedToken
 
-	// if user.ID == 0 {
-	// 	ctx.JSON(http.StatusBadRequest, gin.H{
-	// 		"error": "Invalid email or password",
-	// 	})
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"user": "Failed to generate token",
+			})
+		}
 
-	// 	return
-	// }
-
-	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(body.Password))
-
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid email or password",
-		})
-
-		return
-	}
-
-	token, err := utils.GenerateToken(uint64(user.ID))
-
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to create token",
+		ctx.JSON(http.StatusOK, gin.H{
+			"user": user,
 		})
 
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"user":  user,
-		"token": token,
+		"message": "Phone or password invalid",
 	})
-}
-
-func (h *authHandler) Logout(ctx *gin.Context) {
-	// return
 }

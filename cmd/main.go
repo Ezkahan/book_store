@@ -1,21 +1,18 @@
 package main
 
 import (
-	"github.com/ezkahan/book_store/config"
 	"github.com/ezkahan/book_store/database/mysql"
 	router "github.com/ezkahan/book_store/router"
 )
 
 func init() {
-	config.LoadEnv()
-	mysql.Connection()
-	// config.SyncDatabase()
+	// mysql.SyncDatabase()
 }
 
 func main() {
+	db := mysql.Connection()
+	defer mysql.CloseConnection(db)
+
 	r := router.InitRoutes()
-
-	defer mysql.CloseConnection(mysql.DB)
-
 	r.Run()
 }
