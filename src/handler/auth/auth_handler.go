@@ -8,6 +8,8 @@ import (
 	"github.com/ezkahan/book_store/src/modules/user/service"
 	"github.com/ezkahan/book_store/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 )
 
 type AuthHandler interface {
@@ -26,12 +28,25 @@ func NewAuthHandler(userService service.UserService) AuthHandler {
 }
 
 func (h *authHandler) SignUp(ctx *gin.Context) {
-	var request request.UserCreateRequest
+	var (
+		request  request.UserCreateRequest
+		validate *validator.Validate = validator.New()
+	)
 
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to read body",
 		})
+	}
+
+	err := validate.Struct(request)
+	if err != nil {
+		errors := utils.ParseValidationError(err)
+
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": errors,
+		})
+		return
 	}
 
 	if !h.userService.IsDuplicatePhone(request.Phone) {
@@ -56,11 +71,24 @@ func (h *authHandler) SignUp(ctx *gin.Context) {
 }
 
 func (h *authHandler) SignIn(ctx *gin.Context) {
-	var request request.UserLoginRequest
+	var (
+		request  request.UserLoginRequest = request.UserLoginRequest{}
+		validate *validator.Validate      = validator.New()
+	)
 
-	if err := ctx.ShouldBindJSON(&request); err != nil {
+	if err := ctx.ShouldBindBodyWith(&request, binding.JSON); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"error": "Failed to read body",
+		})
+		return
+	}
+
+	err := validate.Struct(request)
+	if err != nil {
+		errors := utils.ParseValidationError(err)
+
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": errors,
 		})
 		return
 	}
@@ -79,11 +107,10 @@ func (h *authHandler) SignIn(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"user": user,
 		})
-
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
+	ctx.JSON(http.StatusBadRequest, gin.H{
 		"message": "Phone or password invalid",
 	})
 }

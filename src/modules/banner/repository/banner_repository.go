@@ -1,28 +1,43 @@
 package repository
 
 import (
+	"errors"
+
+	"github.com/ezkahan/book_store/src/modules/banner/entity"
 	"gorm.io/gorm"
 )
 
-type IBannerRepository interface {
-	Add(data string) error
-	Delete(id uint) error
+type BannerRepository interface {
+	List() entity.BannerList
+	Add(banner entity.Banner) entity.Banner
+	Delete(id uint64) error
 }
 
-type BannerRepository struct {
+type bannerRepository struct {
 	db *gorm.DB
 }
 
-func NewBannerRepository(db *gorm.DB) *BannerRepository {
-	return &BannerRepository{
-		db: db,
+func NewBannerRepository(db *gorm.DB) BannerRepository {
+	return &bannerRepository{
+		db,
 	}
 }
 
-func (repo *BannerRepository) Add(banner string) {
-	// return repo.db.Create(banner)
+func (repo *bannerRepository) List() entity.BannerList {
+	var banners entity.BannerList
+	repo.db.Find(&banners)
+	return banners
 }
 
-func (repo *BannerRepository) Delete(id uint) {
-	//
+func (repo *bannerRepository) Add(banner entity.Banner) entity.Banner {
+	repo.db.Create(&banner)
+	return banner
+}
+
+func (repo *bannerRepository) Delete(id uint64) error {
+	res := repo.db.Delete(&entity.Banner{}, id)
+	if res.RowsAffected == 0 {
+		return errors.New("not found")
+	}
+	return nil
 }

@@ -3,7 +3,7 @@ package router
 import "github.com/gin-gonic/gin"
 
 func ApiRoutes(router *gin.Engine) {
-	api := router.Group("/api")
+	api := router.Group("/api/v1")
 	{
 		api.GET("/books", func(ctx *gin.Context) {})
 		api.GET("/book/:slug", func(ctx *gin.Context) {})

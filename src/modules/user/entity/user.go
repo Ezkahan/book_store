@@ -3,11 +3,11 @@ package entity
 import (
 	"errors"
 
+	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
+
 	commentEntity "github.com/ezkahan/book_store/src/modules/comment/entity"
 	favoriteEntity "github.com/ezkahan/book_store/src/modules/favorite/entity"
-	"golang.org/x/crypto/bcrypt"
-
-	"gorm.io/gorm"
 )
 
 type User struct {
@@ -35,5 +35,6 @@ func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
 	}
 
 	u.Password = string(hash)
+
 	return
 }
