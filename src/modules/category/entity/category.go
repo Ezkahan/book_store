@@ -1,8 +1,6 @@
 package entity
 
-import (
-	"gorm.io/gorm"
-)
+import "time"
 
 type Category struct {
 	ID          uint64 `gorm:"primaryKey;unique;autoIncrement"`
@@ -11,5 +9,6 @@ type Category struct {
 	Description string `gorm:"text" json:"description"`
 	Icon        string `gorm:"size:255" json:"icon,omitempty"`
 	Preview     int32  `gorm:"default:0" json:"preview"`
-	gorm.Model
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }

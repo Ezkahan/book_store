@@ -28,8 +28,8 @@ func NewBannerService(bannerRepo repository.BannerRepository) BannerService {
 }
 
 func (service *bannerService) List() entity.BannerList {
-	res := service.bannerRepository.List()
-	return res
+	banners := service.bannerRepository.List()
+	return banners
 }
 
 func (service *bannerService) Add(ctx *gin.Context, request request.AddBannerRequest) entity.Banner {
@@ -61,7 +61,7 @@ func (service *bannerService) SaveImage(ctx *gin.Context) string {
 	name := filepath.Base(file.Filename)
 	ctx.SaveUploadedFile(file, "assets/images/banners/"+name)
 
-	return file.Filename
+	return "assets/images/banners/" + name
 }
 
 func (service *bannerService) Delete(id uint64) error {

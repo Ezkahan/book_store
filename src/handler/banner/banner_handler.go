@@ -28,10 +28,10 @@ func NewBannerHandler(bannerService service.BannerService) BannerHandler {
 }
 
 func (h *bannerHandler) GetBanners(ctx *gin.Context) {
-	res := h.bannerService.List()
+	banners := h.bannerService.List()
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"data": res,
+		"data": banners,
 	})
 }
 
@@ -61,7 +61,7 @@ func (h *bannerHandler) Add(ctx *gin.Context) {
 	banner := h.bannerService.Add(ctx, request)
 
 	ctx.JSON(http.StatusBadRequest, gin.H{
-		"success": banner,
+		"data": banner,
 	})
 }
 
@@ -76,6 +76,6 @@ func (h *bannerHandler) Delete(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"success": "Success deleted",
+		"message": "Success deleted",
 	})
 }
