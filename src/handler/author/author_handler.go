@@ -2,7 +2,6 @@ package author
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/ezkahan/book_store/src/modules/author/request"
 	"github.com/ezkahan/book_store/src/modules/author/service"
@@ -70,8 +69,8 @@ func (h *authorHandler) Update(ctx *gin.Context) {
 }
 
 func (h *authorHandler) Get(ctx *gin.Context) {
-	id, _ := strconv.ParseUint(ctx.Param("id"), 10, 64)
-	author, err := h.service.Get(id)
+	slug := ctx.Param("slug")
+	author, err := h.service.Get(slug)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
 			"error": err,
@@ -92,8 +91,8 @@ func (h *authorHandler) List(ctx *gin.Context) {
 }
 
 func (h *authorHandler) Delete(ctx *gin.Context) {
-	id, _ := strconv.ParseUint(ctx.Param("id"), 10, 64)
-	err := h.service.Delete(id)
+	slug := ctx.Param("slug")
+	err := h.service.Delete(slug)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
 			"error": err.Error(),

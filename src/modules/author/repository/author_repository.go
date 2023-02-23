@@ -12,7 +12,7 @@ type AuthorRepository interface {
 	FindByID(id uint64) (entity.Author, error)
 	FindBySlug(slug string) (entity.Author, error)
 	List() entity.AuthorList
-	Delete(id uint64) error
+	Delete(slug string) error
 }
 
 type authorRepository struct {
@@ -48,8 +48,9 @@ func (repo *authorRepository) List() entity.AuthorList {
 	return authors
 }
 
-func (repo *authorRepository) Delete(id uint64) error {
-	res := repo.db.Delete(&entity.Author{}, id)
+func (repo *authorRepository) Delete(slug string) error {
+	var author entity.Author
+	res := repo.db.Where("slug = ?", slug).Delete(&author)
 	if res.RowsAffected == 0 {
 		return errors.New("not found")
 	}

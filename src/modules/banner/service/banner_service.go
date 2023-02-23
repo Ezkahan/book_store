@@ -59,9 +59,10 @@ func (service *bannerService) Add(ctx *gin.Context, request request.AddBannerReq
 func (service *bannerService) SaveImage(ctx *gin.Context) string {
 	file, _ := ctx.FormFile("image")
 	name := filepath.Base(file.Filename)
-	ctx.SaveUploadedFile(file, "assets/images/banners/"+name)
+	path := "assets/images/banners/"
+	ctx.SaveUploadedFile(file, path+name)
 
-	return "assets/images/banners/" + name
+	return path + name
 }
 
 func (service *bannerService) Delete(id uint64) error {

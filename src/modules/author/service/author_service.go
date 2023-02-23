@@ -12,9 +12,9 @@ import (
 type AuthorService interface {
 	Add(ctx *gin.Context, request request.AddAuthorRequest) (entity.Author, error)
 	Update()
-	Get(id uint64) (entity.Author, error)
+	Get(slug string) (entity.Author, error)
 	List() entity.AuthorList
-	Delete(id uint64) error
+	Delete(slug string) error
 }
 
 type authorService struct {
@@ -49,13 +49,13 @@ func (service *authorService) List() entity.AuthorList {
 	return authors
 }
 
-func (service *authorService) Get(id uint64) (entity.Author, error) {
-	author, err := service.authorRepository.FindByID(id)
+func (service *authorService) Get(slug string) (entity.Author, error) {
+	author, err := service.authorRepository.FindBySlug(slug)
 	return author, err
 }
 
-func (service *authorService) Delete(id uint64) error {
-	err := service.authorRepository.Delete(id)
+func (service *authorService) Delete(slug string) error {
+	err := service.authorRepository.Delete(slug)
 	if err != nil {
 		return err
 	}
